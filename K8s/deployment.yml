@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bankdash-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bankdash-frontend
+  template:
+    metadata:
+      labels:
+        app: bankdash-frontend
+    spec:
+      containers:
+        - name: bankdash-frontend
+          image: nelsonobazee12518/bankdash-frontend:latest
+          ports:
+            - containerPort: 80
+
