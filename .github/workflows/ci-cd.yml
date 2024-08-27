@@ -53,11 +53,13 @@ jobs:
 
       - name: Set up Kubernetes context
         run: |
-          kubectl config set-context my-cluster --cluster=my-cluster --user=my-user --namespace=default
+          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+          kubectl config view
 
       - name: Apply Kubernetes deployment
         run: |
-          kubectl apply -f K8s/deployment.yaml
+          kubectl apply -f k8s/deployment.yaml
           kubectl apply -f k8s/service.yaml
+
 
 
