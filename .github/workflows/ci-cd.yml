@@ -35,7 +35,6 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/bankdash-frontend:latest
 
@@ -46,16 +45,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy to Kubernetes
-        uses: azure/setup-kubectl@v1
-        with:
-          version: '1.27.0'
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/v1.27.0/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
 
       - name: Set up Kubernetes context
-        run: kubectl config set-context my-cluster --cluster=my-cluster --user=my-user --namespace=default
+        run: |
+          kubectl config set-context my-cluster --cluster=my-cluster --user=my-user --namespace=default
 
       - name: Apply Kubernetes deployment
         run: |
           kubectl apply -f K8s/deployment.yaml
-          kubectl apply -f K8s/service.yaml
+          kubectl apply -f k8s/service.yaml
+
 
