@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build:
@@ -56,6 +56,6 @@ jobs:
 
       - name: Apply Kubernetes deployment
         run: |
-          kubectl apply -f k8s/deployment.yaml
-          kubectl apply -f k8s/service.yaml
+          kubectl apply -f K8s/deployment.yaml
+          kubectl apply -f K8s/service.yaml
 
