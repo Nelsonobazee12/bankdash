@@ -4,6 +4,8 @@ import { useBreakpoints } from 'providers/useBreakpoints';
 import { useState } from 'react';
 import Cookies from 'js-cookie';
 
+const backendUrl: string = import.meta.env.VITE_BACKEND_URL || 'default_url';
+
 interface LoginFormData {
   email: string;
   password: string;
@@ -31,7 +33,7 @@ const LoginForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    fetch('http://localhost:8080/api/v1/registration/authenticate', {
+    fetch(`${backendUrl}/api/v1/registration/authenticate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

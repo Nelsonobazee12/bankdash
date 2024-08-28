@@ -4,6 +4,8 @@ import { useBreakpoints } from 'providers/useBreakpoints';
 import { useState } from 'react';
 import Cookies from 'js-cookie';
 
+const backendUrl: string = import.meta.env.VITE_BACKEND_URL || 'default_url';
+
 interface SignupFormData {
   name: string;
   email: string;
@@ -41,7 +43,7 @@ const SignupForm: React.FC = () => {
       return;
     }
 
-    fetch('http://localhost:8080/api/v1/registration/register', {
+    fetch(`${backendUrl}/api/v1/registration/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

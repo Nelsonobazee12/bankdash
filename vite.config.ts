@@ -3,7 +3,6 @@ import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   optimizeDeps: {
     include: ['@emotion/styled'],
@@ -18,13 +17,20 @@ export default defineConfig({
       },
     }),
   ],
-  base: '/bankdash',
-
-  //   preview: {
-  //     port: 5000,
-  //   },
+  base: '/bankdash/', // Ensure this matches the base path of your app
+  build: {
+    outDir: 'build',  // Correct output directory
+  },
   server: {
-    host: '0.0.0.0',
-    port: 3000,
+    proxy: {
+      '/api': {
+        target: 'https://yourbackend.loca.lt',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
   },
 });
+
+

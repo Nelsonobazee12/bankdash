@@ -15,6 +15,8 @@ import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import IconifyIcon from 'components/base/IconifyIcon';
 
+const backendUrl: string = import.meta.env.VITE_BACKEND_URL || 'default_url';
+
 interface UserProfile {
   name: string;
   roles: string;
@@ -43,7 +45,7 @@ const ProfileDropdown = () => {
     const accessToken = Cookies.get('accessToken');
 
     if (accessToken) {
-      fetch('http://localhost:8080/api/v1/get_current_user', {
+      fetch(`${backendUrl}/api/v1/get_current_user`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
@@ -70,7 +72,7 @@ const ProfileDropdown = () => {
   const handleLogout = () => {
     const accessToken = Cookies.get('accessToken');
 
-    fetch('http://localhost:8080/api/v1/logout', {
+    fetch(`${backendUrl}/api/v1/logout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
