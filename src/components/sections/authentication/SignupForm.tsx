@@ -43,7 +43,7 @@ const SignupForm: React.FC = () => {
       return;
     }
 
-    fetch(`${backendUrl}/api/v1/registration/register`, {
+    fetch(`${backendUrl}api/v1/registration/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
