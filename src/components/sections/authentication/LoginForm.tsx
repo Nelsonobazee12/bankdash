@@ -1,7 +1,7 @@
 import { Button, Grid, IconButton, InputAdornment, Link, TextField } from '@mui/material';
 import IconifyIcon from 'components/base/IconifyIcon';
 import { useBreakpoints } from 'providers/useBreakpoints';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 
 const backendUrl: string = import.meta.env.VITE_BACKEND_URL || 'default_url';
@@ -33,7 +33,7 @@ const LoginForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    fetch(`${backendUrl}api/v1/registration/authenticate`, {
+    fetch(`${backendUrl}/api/v1/registration/authenticate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
