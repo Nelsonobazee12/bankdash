@@ -18,12 +18,10 @@ export default defineConfig({
       },
     }),
   ],
-  base: '/bankdash',
-
+  base: '/bankdash/',
   build: {
     outDir: 'dist'
   },
-
   server: {
     host: '0.0.0.0',
     port: 3000,
