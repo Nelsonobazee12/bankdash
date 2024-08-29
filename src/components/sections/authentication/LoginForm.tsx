@@ -33,7 +33,7 @@ const LoginForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    fetch(`${backendUrl}/api/v1/registration/authenticate`, {
+    fetch(`${backendUrl}api/v1/registration/authenticate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
