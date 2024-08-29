@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/bankdash/(.*)", "destination": "/bankdash/index.html" }
+    { "source": "/(.*)", "destination": "/" }
   ]
 }

@@ -91,8 +91,5 @@ export const routes = [
   },
 ];
 
-const router = createBrowserRouter(routes, {
-  basename: '/bankdash',
-});
-
+const router = createBrowserRouter(routes);
 export default router;

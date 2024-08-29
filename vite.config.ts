@@ -18,7 +18,6 @@ export default defineConfig({
       },
     }),
   ],
-  base: '/bankdash/',
   build: {
     outDir: 'dist'
   },

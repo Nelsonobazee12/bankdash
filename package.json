@@ -3,7 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "/bankdash",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -50,3 +49,4 @@
     "vite-tsconfig-paths": "^4.3.2"
   }
 }
+
