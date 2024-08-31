@@ -1,6 +1,7 @@
 import { Box, Button, Card, Container, Divider, Link, Stack, Typography } from '@mui/material';
 import IconifyIcon from 'components/base/IconifyIcon';
 import SignupForm from 'components/sections/authentication/SignupForm';
+import { handleOAuth2Redirect } from '../login';
 
 const SignupPage = () => {
   return (
@@ -39,7 +40,14 @@ const SignupPage = () => {
             </Typography>
 
             <Stack direction="row" spacing={{ xs: 1, sm: 2 }}>
-              <Button fullWidth size="large" color="neutral" variant="outlined" sx={{ p: 1 }}>
+              <Button
+                onClick={() => handleOAuth2Redirect('sigup')}
+                fullWidth
+                size="large"
+                color="neutral"
+                variant="outlined"
+                sx={{ p: 1 }}
+              >
                 <IconifyIcon icon="eva:google-fill" color="error.main" />
               </Button>
               <Button fullWidth size="large" color="neutral" variant="outlined" sx={{ p: 1 }}>

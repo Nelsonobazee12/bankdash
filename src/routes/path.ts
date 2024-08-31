@@ -15,11 +15,13 @@ const paths = {
   investments: `${rootPaths.pagesRoot}investments`,
   loans: `${rootPaths.pagesRoot}loans`,
   accounts: `${rootPaths.pagesRoot}accounts`,
+  oauth2: `${rootPaths.authRoot}oauth2-callback`,
   login: `${rootPaths.authRoot}/login`,
   signup: `${rootPaths.authRoot}/sign-up`,
   forgetPassword: `${rootPaths.authRoot}/forget-password`,
   resetPassword: `${rootPaths.authRoot}/reset-password`,
   notFound: `${rootPaths.errorRoot}/404`,
+  anyError: `${rootPaths.errorRoot}`,
 };
 
 export default paths;

@@ -9,8 +9,7 @@ import {
   Typography,
   Link,
 } from '@mui/material';
-import { useEffect, useState, MouseEvent } from 'react';
-import { Fragment } from 'react/jsx-runtime';
+import { useEffect, useState, MouseEvent, Fragment } from 'react';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import IconifyIcon from 'components/base/IconifyIcon';
@@ -21,10 +20,9 @@ interface UserProfile {
   name: string;
   roles: string;
   email: string;
-  image: string;
+  profileImage: string;
 }
 
-/* ------------------------Profile dropdown Data --------------------------- */
 const profileData = [
   {
     href: '#!',
@@ -34,7 +32,6 @@ const profileData = [
     color: 'primary.light',
   },
 ];
-/* -------------------------------------------------------------------------- */
 
 const ProfileDropdown = () => {
   const navigate = useNavigate();
@@ -53,6 +50,7 @@ const ProfileDropdown = () => {
       })
         .then((response) => response.json())
         .then((data) => {
+          console.log('Profile Image URL:', data.profileImage);
           setUserProfile(data);
         })
         .catch((error) => {
@@ -96,8 +94,8 @@ const ProfileDropdown = () => {
     <Fragment>
       <IconButton sx={{ p: 0, position: 'relative' }} onClick={handleOpenDropdown}>
         <Avatar
-          alt="Avatar"
-          src={userProfile?.image}
+          alt="Profile Image"
+          src={userProfile?.profileImage || 'loading...'}
           sx={{ width: { xs: 40, md: 45, xl: 60 }, height: { xs: 40, md: 45, xl: 60 } }}
         />
       </IconButton>
@@ -121,7 +119,11 @@ const ProfileDropdown = () => {
             User Profile
           </Typography>
           <Stack direction="row" py={2.5} spacing={1.5} alignItems="center">
-            <Avatar src={userProfile?.image} alt="Profile Image" sx={{ width: 65, height: 65 }} />
+            <Avatar
+              src={userProfile?.profileImage || 'loading...'}
+              alt="Profile Image"
+              sx={{ width: 65, height: 65 }}
+            />
             <Box>
               <Typography variant="subtitle2" color="text.primary" fontWeight={600}>
                 {userProfile?.name || 'Loading...'}
@@ -142,7 +144,6 @@ const ProfileDropdown = () => {
             </Box>
           </Stack>
           <Divider />
-          {/* Profile Data Links */}
           {profileData.map((profileItem) => (
             <Box key={profileItem.title} sx={{ py: 1.5, px: 0 }}>
               <Link href={profileItem.href}>

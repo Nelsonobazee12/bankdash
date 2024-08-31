@@ -2,6 +2,12 @@ import { Box, Button, Card, Container, Divider, Link, Stack, Typography } from '
 import IconifyIcon from 'components/base/IconifyIcon';
 import LoginForm from 'components/sections/authentication/LoginForm';
 
+const backendUrl: string = import.meta.env.VITE_BACKEND_URL || 'default_url';
+
+export const handleOAuth2Redirect = (state: string) => {
+  window.location.href = `${backendUrl}/oauth2/authorization/google?state=${state}`;
+};
+
 const LoginPage = () => {
   return (
     <Box
@@ -40,7 +46,14 @@ const LoginPage = () => {
             </Typography>
 
             <Stack direction="row" spacing={{ xs: 1, sm: 2 }}>
-              <Button fullWidth size="large" color="neutral" variant="outlined" sx={{ p: 1 }}>
+              <Button
+                onClick={() => handleOAuth2Redirect('login')}
+                fullWidth
+                size="large"
+                color="neutral"
+                variant="outlined"
+                sx={{ p: 1 }}
+              >
                 <IconifyIcon icon="eva:google-fill" color="error.main" />
               </Button>
               <Button fullWidth size="large" color="neutral" variant="outlined" sx={{ p: 1 }}>

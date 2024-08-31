@@ -68,6 +68,7 @@ const SignupForm: React.FC = () => {
           setTimeout(() => {
             setSuccessMessage(null);
           }, 2000);
+          window.location.href = '/authentication/login';
         } else {
           throw new Error('Authentication token or refresh token is missing or invalid.');
         }
