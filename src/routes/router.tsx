@@ -15,7 +15,7 @@ const LoginPage = lazy(() => import('pages/authentication/login'));
 const SignUpPage = lazy(() => import('pages/authentication/signup'));
 const ForgetPasswordPage = lazy(() => import('pages/authentication/forget-password'));
 const ResetPasswordPage = lazy(() => import('pages/authentication/reset-password'));
-const OAuth2Callback = lazy(() => import('components/sections/authentication/OAuth2Callback'));
+const OAuth2CallbackPage = lazy(() => import('pages/OAuth2Callback'));
 const NotFoundPage = lazy(() => import('pages/not-found'));
 const ErrorPage = lazy(() => import('pages/error-page'));
 /* -------------------------------------------------------------------------- */
@@ -67,7 +67,7 @@ export const routes = [
           },
           {
             path: paths.oauth2,
-            element: <OAuth2Callback />,
+            element: <OAuth2CallbackPage />,
           },
           {
             path: paths.forgetPassword,
