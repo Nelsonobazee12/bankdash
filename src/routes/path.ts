@@ -15,7 +15,7 @@ const paths = {
   investments: `${rootPaths.pagesRoot}investments`,
   loans: `${rootPaths.pagesRoot}loans`,
   accounts: `${rootPaths.pagesRoot}accounts`,
-  oauth2: `${rootPaths.authRoot}oauth2-callback`,
+  oauth2: `${rootPaths.authRoot}/oauth2-callback`,
   login: `${rootPaths.authRoot}/login`,
   signup: `${rootPaths.authRoot}/sign-up`,
   forgetPassword: `${rootPaths.authRoot}/forget-password`,
