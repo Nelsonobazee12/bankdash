@@ -39,6 +39,7 @@ export const RecentTransactions: React.FC = () => {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
           },
           credentials: 'include',
         });
