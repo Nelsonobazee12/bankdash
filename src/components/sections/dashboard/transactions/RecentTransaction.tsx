@@ -69,91 +69,98 @@ export const RecentTransactions: React.FC = () => {
   return (
     <CardContainer title="Recent Transactions">
       <Card sx={{ p: { xs: 0.5, xl: 1 } }}>
-        <List disablePadding sx={{ color: 'primary.main', '& > *:not(:last-child)': { mb: 2.5 } }}>
-          {transactions.map(({ id, icon, bgcolor, title, date, amount, type, amountColor }) => {
-            const IconComponent = iconMap[icon];
-            return (
-              <ListItem
-                key={id}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 3,
-                  '&:hover': {
-                    '& .title': {
-                      color: 'text.secondary',
-                    },
-                    '& .date': {
-                      color: 'neutral.main',
-                      transform: 'translateX(2px)',
-                    },
-                  },
-                }}
-                disablePadding
-              >
-                <Stack
-                  direction="row"
+        {transactions.length === 0 ? (
+          <Typography sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>
+            No recent transactions available.
+          </Typography>
+        ) : (
+          <List disablePadding sx={{ color: 'primary.main', '& > *:not(:last-child)': { mb: 2.5 } }}>
+            {transactions.map(({ id, icon, bgcolor, title, date, amount, type, amountColor }) => {
+              const IconComponent = iconMap[icon];
+              return (
+                <ListItem
+                  key={id}
                   sx={{
-                    width: 55,
-                    height: 55,
+                    display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    bgcolor: bgcolor,
-                    borderRadius: '50%',
+                    gap: 3,
+                    '&:hover': {
+                      '& .title': {
+                        color: 'text.secondary',
+                      },
+                      '& .date': {
+                        color: 'neutral.main',
+                        transform: 'translateX(2px)',
+                      },
+                    },
                   }}
+                  disablePadding
                 >
-                  <IconComponent sx={{ mb: 0.75 }} />
-                </Stack>
-                <Stack
-                  direction="row"
-                  sx={{
-                    flexGrow: 1,
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Stack gap={1}>
+                  <Stack
+                    direction="row"
+                    sx={{
+                      width: 55,
+                      height: 55,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      bgcolor: bgcolor,
+                      borderRadius: '50%',
+                    }}
+                  >
+                    <IconComponent sx={{ mb: 0.75 }} />
+                  </Stack>
+                  <Stack
+                    direction="row"
+                    sx={{
+                      flexGrow: 1,
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Stack gap={1}>
+                      <Typography
+                        className="title"
+                        sx={{
+                          color: 'primary.darker',
+                          fontSize: { xs: 'subtitle1.fontSize', md: 'body2.fontSize' },
+                        }}
+                      >
+                        {title}
+                      </Typography>
+                      <Typography
+                        className="date"
+                        sx={{
+                          color: 'primary.light',
+                          fontSize: {
+                            xs: 'caption.fontSize',
+                            sm: 'caption.fontSize',
+                            md: 'body1.fontSize',
+                          },
+                        }}
+                      >
+                        {date}
+                      </Typography>
+                    </Stack>
                     <Typography
-                      className="title"
                       sx={{
-                        color: 'primary.darker',
-                        fontSize: { xs: 'subtitle1.fontSize', md: 'body2.fontSize' },
-                      }}
-                    >
-                      {title}
-                    </Typography>
-                    <Typography
-                      className="date"
-                      sx={{
-                        color: 'primary.light',
+                        color: amountColor,
                         fontSize: {
                           xs: 'caption.fontSize',
-                          sm: 'caption.fontSize',
+                          sm: 'button.fontSize',
                           md: 'body1.fontSize',
                         },
                       }}
                     >
-                      {date}
+                      {type === 'credit' ? '+' : '-'} {currencyFormat(amount)}
                     </Typography>
                   </Stack>
-                  <Typography
-                    sx={{
-                      color: amountColor,
-                      fontSize: {
-                        xs: 'caption.fontSize',
-                        sm: 'button.fontSize',
-                        md: 'body1.fontSize',
-                      },
-                    }}
-                  >
-                    {type === 'credit' ? '+' : '-'} {currencyFormat(amount)}
-                  </Typography>
-                </Stack>
-              </ListItem>
-            );
-          })}
-        </List>
+                </ListItem>
+              );
+            })}
+          </List>
+        )}
       </Card>
     </CardContainer>
   );
 };
+
