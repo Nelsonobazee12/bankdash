@@ -8,8 +8,8 @@ import { currencyFormat } from 'helpers/utils';
 
 export interface CreditCardData {
   balance: string;
-  cardHolder: string;
-  validThru: string;
+  cardHolderName: string;
+  expiryDate: string;
   cardNumber: string;
   theme?: 'blue' | 'white';
 }
@@ -52,12 +52,19 @@ const getThemeStyles = (theme: 'blue' | 'white', palette: Palette) => {
   }
 };
 
+const maskCardNumber = (cardNumber: string): string => {
+  // Mask all but the last four digits
+  const masked = cardNumber.slice(0, -4).replace(/\d/g, '*');
+  const lastFour = cardNumber.slice(-4);
+  return `${masked} ${lastFour}`;
+};
+
 const CreditCard = ({ theme = 'white', cardData }: CreditCardProps) => {
   const { palette } = useTheme();
   const { cardBg, textColor, cardGradient, borderStyle, bankLogo, chipCard, labelColor } =
     getThemeStyles(theme, palette);
 
-  const { balance, cardHolder, validThru, cardNumber } = cardData;
+  const { balance, cardHolderName: cardHolder, expiryDate: validThru, cardNumber } = cardData;
 
   return (
     <Card
@@ -151,7 +158,7 @@ const CreditCard = ({ theme = 'white', cardData }: CreditCardProps) => {
             fontSize: { xs: 'body1.fontSize', md: 'h3.fontSize' },
           }}
         >
-          {cardNumber}
+          {maskCardNumber(cardNumber)}
         </Typography>
         <Image src={bankLogo} alt="bank-logo" sx={{ width: 50 }} />
       </Stack>

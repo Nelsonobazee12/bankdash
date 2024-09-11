@@ -1,4 +1,11 @@
-import { Button, Grid, IconButton, InputAdornment, TextField } from '@mui/material';
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  IconButton,
+  InputAdornment,
+  TextField,
+} from '@mui/material';
 import IconifyIcon from 'components/base/IconifyIcon';
 import { useBreakpoints } from 'providers/useBreakpoints';
 import React, { useState } from 'react';
@@ -24,6 +31,7 @@ const SignupForm: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { up } = useBreakpoints();
   const upSM = up('sm');
 
@@ -35,7 +43,7 @@ const SignupForm: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
@@ -43,43 +51,46 @@ const SignupForm: React.FC = () => {
       return;
     }
 
-    fetch(`${backendUrl}/api/v1/registration/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Registration failed. Please try again later.');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        const { access_token } = data;
-        if (access_token) {
-          setCookies(access_token);
-          setSuccessMessage('Registration successful! Please confirm your email');
-          setTimeout(() => {
-            setSuccessMessage(null);
-          }, 2000);
-          window.location.href = '/authentication/login';
-        } else {
-          throw new Error('Authentication token or refresh token is missing or invalid.');
-        }
-      })
-      .catch((error: Error) => {
-        console.error('Error:', error);
-        setError('Registration failed.');
-        setTimeout(() => {
-          setError(null);
-        }, 2000);
+    setIsLoading(true); // Start loading
+
+    try {
+      const response = await fetch(`${backendUrl}/api/v1/registration/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Registration failed. Please try again later.');
+      }
+
+      const data = await response.json();
+      const { access_token } = data;
+      if (access_token) {
+        setCookies(access_token);
+        setSuccessMessage('Registration successful! Please confirm your email');
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 2000);
+        window.location.href = '/authentication/login';
+      } else {
+        throw new Error('Authentication token or refresh token is missing or invalid.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setError('Registration failed.');
+      setTimeout(() => {
+        setError(null);
+      }, 2000);
+    } finally {
+      setIsLoading(false); // Stop loading
+    }
   };
 
   const setCookies = (authToken: string) => {
@@ -163,8 +174,9 @@ const SignupForm: React.FC = () => {
         type="submit"
         variant="contained"
         color="primary"
+        disabled={isLoading} // Disable the button while loading
       >
-        Sign Up
+        {isLoading ? <CircularProgress size={24} /> : 'Sign Up'}
       </Button>
       {successMessage && <p>{successMessage}</p>}
       {error && <p>{error}</p>}

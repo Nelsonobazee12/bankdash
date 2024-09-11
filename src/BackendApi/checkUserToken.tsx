@@ -31,16 +31,13 @@ const checkUserToken = () => {
 
   useEffect(() => {
     if (isTokenExpired()) {
+      alert('Your session has expired. Please log in again.'); // Show an alert with the error message
       Cookies.remove('accessToken');
       navigate('/authentication/login');
     }
   }, [navigate]);
 
-  useEffect(() => {
-    if (isTokenExpired()) {
-      Cookies.remove('accessToken');
-    }
-  }, []);
+  return null; // This component does not render anything
 };
 
 export default checkUserToken;

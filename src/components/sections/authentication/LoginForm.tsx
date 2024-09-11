@@ -1,4 +1,12 @@
-import { Button, Grid, IconButton, InputAdornment, Link, TextField } from '@mui/material';
+import {
+  Button,
+  Grid,
+  CircularProgress,
+  IconButton,
+  InputAdornment,
+  Link,
+  TextField,
+} from '@mui/material';
 import IconifyIcon from 'components/base/IconifyIcon';
 import { useBreakpoints } from 'providers/useBreakpoints';
 import React, { useState } from 'react';
@@ -18,6 +26,7 @@ const LoginForm: React.FC = () => {
     password: '',
   });
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const { up } = useBreakpoints();
   const upSM = up('sm');
@@ -30,45 +39,50 @@ const LoginForm: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    fetch(`${backendUrl}/api/v1/registration/authenticate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.password,
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Login Faild, Check Your Email');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        const { access_token } = data;
-        if (access_token) {
-          setCookies(access_token);
-          setSuccessMessage('Login successful!');
-          window.location.href = '/';
-          setTimeout(() => {
-            setSuccessMessage(null);
-          }, 2000);
-        } else {
-          throw new Error('Authentication token or refresh token is missing or invalid.');
-        }
-      })
-      .catch((error: Error) => {
-        console.error('Error:', error);
-        setError('Login failed.');
-        setTimeout(() => {
-          setError(null);
-        }, 2000);
+    setIsLoading(true);
+    setError(null); // Clear previous errors
+
+    try {
+      const response = await fetch(`${backendUrl}/api/v1/registration/authenticate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Login Failed, Check Your Email');
+      }
+
+      const data = await response.json();
+      const { access_token } = data;
+
+      if (access_token) {
+        setCookies(access_token);
+        setSuccessMessage('Login successful!');
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 2000);
+        window.location.href = '/'; // Navigate after setting the success message
+      } else {
+        throw new Error('Authentication token or refresh token is missing or invalid.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setError('Login failed.');
+      setTimeout(() => {
+        setError(null);
+      }, 2000);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const setCookies = (authToken: string) => {
@@ -122,8 +136,9 @@ const LoginForm: React.FC = () => {
         type="submit"
         variant="contained"
         color="primary"
+        disabled={isLoading}
       >
-        Login
+        {isLoading ? <CircularProgress size={24} /> : 'Login'}
       </Button>
       {successMessage && <p>{successMessage}</p>}
       {error && <p>{error}</p>}

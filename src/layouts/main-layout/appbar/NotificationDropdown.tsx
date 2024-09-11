@@ -1,3 +1,4 @@
+import React, { Fragment, useState, useEffect } from 'react';
 import {
   Avatar,
   Box,
@@ -11,71 +12,75 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import StatementImage from 'assets/income-details.svg';
-import LoanImage from 'assets/loan.svg';
-import TransactionImage from 'assets/transaction-money.svg';
+// import StatementImage from 'assets/income-details.svg';
+// import LoanImage from 'assets/loan.svg';
+// import TransactionImage from 'assets/transaction-money.svg';
 import IconifyIcon from 'components/base/IconifyIcon';
 import dayjs from 'dayjs';
-import { uniqueId } from 'lodash';
-import { Fragment } from 'react/jsx-runtime';
 import SimpleBar from 'simplebar-react';
+import Cookies from 'js-cookie';
 
-const notifications_data = [
-  {
-    id: uniqueId(),
-    title: 'Transaction Successful',
-    description: 'You have received $500 from John Doe',
-    avatar: TransactionImage,
-    createdAt: dayjs().toDate(),
-    isUnRead: true,
-  },
-  {
-    id: uniqueId(),
-    title: 'Low Balance Alert',
-    description: 'Your account balance is below $100',
-    avatar: null,
-    createdAt: dayjs().subtract(2, 'hour').subtract(45, 'minute').toDate(),
-    isUnRead: true,
-  },
-  {
-    id: uniqueId(),
-    title: 'New Loan Offer',
-    description: 'You are eligible for a new personal loan',
-    avatar: LoanImage,
-    createdAt: dayjs().subtract(1, 'day').subtract(1, 'hour').toDate(),
-    isUnRead: false,
-  },
-  {
-    id: uniqueId(),
-    title: 'Account Statement Ready',
-    description: 'Your monthly account statement is now available',
-    avatar: StatementImage,
-    createdAt: dayjs().subtract(2, 'day').subtract(3, 'hour').toDate(),
-    isUnRead: false,
-  },
-  {
-    id: uniqueId(),
-    title: 'Security Alert',
-    description: 'Unusual login attempt detected',
-    avatar: null,
-    createdAt: dayjs().subtract(3, 'day').subtract(4, 'hour').toDate(),
-    isUnRead: true,
-  },
-  {
-    id: uniqueId(),
-    title: 'Payment Reminder',
-    description: 'Your credit card payment is due tomorrow',
-    avatar: null,
-    createdAt: dayjs().subtract(1, 'day').subtract(2, 'hour').toDate(),
-    isUnRead: false,
-  },
-];
+const defaultAvatar = './assets/profile/image-1.png';
+
+const backendUrl: string = import.meta.env.VITE_BACKEND_URL || 'default_url';
+
+interface AppUser {
+  profileImage: string;
+}
+
+interface Notification {
+  id: number;
+  message: string;
+  timestamp: string;
+  appUser: AppUser;
+}
+
 interface NotificationDropdownProps {
   onClose: () => void;
   open: null | HTMLElement;
 }
+
 const NotificationDropdown = ({ open, onClose }: NotificationDropdownProps) => {
-  const totalUnreadMsg = notifications_data.filter((item) => item.isUnRead === true).length;
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const accessToken = Cookies.get('accessToken');
+    const fetchNotifications = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${backendUrl}/api/v1/cards/bank-card/notification`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          credentials: 'include', // if you need to include cookies for authentication
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const data: Notification[] = await response.json();
+        const sortedNotifications = data.sort(
+          (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+        );
+        setNotifications(sortedNotifications);
+      } catch (error) {
+        setError('Error fetching data:');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  const totalUnreadMsg = notifications.length; // Adjusted to count all notifications
+
+  if (loading) return <Typography>Loading...</Typography>;
+  if (error) return <Typography color="error">{error}</Typography>;
 
   return (
     <Fragment>
@@ -95,29 +100,26 @@ const NotificationDropdown = ({ open, onClose }: NotificationDropdownProps) => {
           <Stack gap={1} sx={{ flexGrow: 1 }}>
             <Typography variant="subtitle1">All Notifications</Typography>
             <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-              You have {totalUnreadMsg} unread messages
+              You have {totalUnreadMsg} notifications
             </Typography>
           </Stack>
         </Stack>
         <Divider sx={{ borderStyle: 'dashed' }} />
         <List disablePadding dense>
           <SimpleBar style={{ height: '100%', maxHeight: 350 }}>
-            {notifications_data.map((notification) => (
+            {notifications.map((notification) => (
               <ListItemButton
                 key={notification.id}
                 sx={{
                   py: 1.5,
                   px: 2.5,
                   mt: '1px',
-                  ...(notification.isUnRead && {
-                    bgcolor: 'background.paper',
-                  }),
                 }}
               >
                 <ListItemAvatar>
                   <Avatar
                     sx={{ bgcolor: 'action.disabledBackground', width: 35, height: 35 }}
-                    src={notification.avatar || './assets/profile/image-1.png'}
+                    src={notification.appUser.profileImage || defaultAvatar}
                   />
                 </ListItemAvatar>
                 <ListItemText
@@ -128,7 +130,7 @@ const NotificationDropdown = ({ open, onClose }: NotificationDropdownProps) => {
                         textTransform: 'capitalize',
                       }}
                     >
-                      {notification.title}
+                      {notification.message}
                     </Typography>
                   }
                   secondary={
@@ -145,7 +147,7 @@ const NotificationDropdown = ({ open, onClose }: NotificationDropdownProps) => {
                         icon="flat-color-icons:clock"
                         sx={{ mr: 0.5, width: 16, height: 16 }}
                       />
-                      {dayjs(notification.createdAt).format('MMM D, YYYY h:mm A')}
+                      {dayjs(notification.timestamp).format('MMM D, YYYY h:mm A')}
                     </Typography>
                   }
                 />
@@ -154,7 +156,6 @@ const NotificationDropdown = ({ open, onClose }: NotificationDropdownProps) => {
           </SimpleBar>
         </List>
         <Divider sx={{ borderStyle: 'dashed' }} />
-
         <Box sx={{ p: 1 }}>
           <Button fullWidth disableRipple color="primary">
             View All

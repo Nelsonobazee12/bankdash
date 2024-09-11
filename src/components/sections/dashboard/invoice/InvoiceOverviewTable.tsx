@@ -10,10 +10,33 @@ import CustomPagination from 'components/sections/dashboard/invoice/CustomPagina
 import NoData from 'components/sections/dashboard/invoice/NoData';
 import RenderCellDescription from 'components/sections/dashboard/invoice/RenderCellDescription';
 import RenderCellDownload from 'components/sections/dashboard/invoice/RenderCellDownload';
-import { invoiceRowData, RowData } from 'data/invoice-data';
 import { currencyFormat, dateFormatFromUTC } from 'helpers/utils';
 import { useBreakpoints } from 'providers/useBreakpoints';
 import { SyntheticEvent, useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
+import { shortenString } from 'helpers/utils';
+
+const backendUrl: string = import.meta.env.VITE_BACKEND_URL || 'default_url';
+
+// Define the API response type
+interface Transaction {
+  id: number;
+  type: string;
+  transactionId: string;
+  cardNumber: string;
+  timestamp: string;
+  amount: number;
+}
+
+interface RowData {
+  id: number;
+  description: { title: string; revenue: string };
+  transactionId: string;
+  type: string;
+  card: string;
+  date: string;
+  amount: number;
+}
 
 const columns: GridColDef[] = [
   {
@@ -30,7 +53,7 @@ const columns: GridColDef[] = [
     flex: 1,
     minWidth: 150,
     hideable: false,
-    renderCell: (params) => <>#{params.value}</>,
+    renderCell: (params) => <>{shortenString(params.value, 6, 4)}</>, // Shortening Transaction ID
   },
   {
     field: 'type',
@@ -45,6 +68,7 @@ const columns: GridColDef[] = [
     minWidth: 100,
     flex: 1,
     hideable: false,
+    renderCell: (params) => <>{shortenString(params.value, 4, 4)}</>, // Shortening Card
   },
   {
     field: 'date',
@@ -119,22 +143,57 @@ const InvoiceOverviewTable: React.FC = () => {
   const filterData = (tabIndex: number) => {
     switch (tabIndex) {
       case 1:
-        setItems(invoiceRowData.filter((row) => row.description.revenue === 'up'));
+        setItems((prevItems) => prevItems.filter((row) => row.description.revenue === 'up'));
         break;
       case 2:
-        setItems(invoiceRowData.filter((row) => row.description.revenue === 'down'));
+        setItems((prevItems) => prevItems.filter((row) => row.description.revenue === 'down'));
         break;
       default:
-        setItems(invoiceRowData);
+        setItems((prevItems) => prevItems); // Reset to all items
         break;
     }
   };
 
   useEffect(() => {
-    setLoading(true);
+    const accessToken = Cookies.get('accessToken');
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${backendUrl}/api/v1/cards/bank-card/transactions`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          credentials: 'include', // if you need to include cookies for authentication
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const data: Transaction[] = await response.json();
+        const formattedData = data.map((item) => ({
+          id: item.id,
+          description: { title: item.type, revenue: item.type === 'DEPOSIT' ? 'up' : 'down' },
+          transactionId: item.transactionId,
+          type: item.type,
+          card: item.cardNumber.slice(-4).padStart(item.cardNumber.length, '*'),
+          date: item.timestamp,
+          amount: item.amount,
+        }));
+        setItems(formattedData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     filterData(value);
-    setLoading(false);
-  }, [value]);
+  }, [value, items]);
 
   return (
     <Stack sx={{ overflow: 'auto', justifyContent: 'space-between' }}>
@@ -207,21 +266,16 @@ const InvoiceOverviewTable: React.FC = () => {
             '& .MuiDataGrid-cell': {
               fontSize: { xs: 13, lg: 16 },
             },
-            '& .MuiTypography-root': {
-              fontSize: { xs: 13, lg: 16 },
-            },
           }}
         />
-      </Card>
-      <Box sx={{ mt: 2, display: 'flex', justifyContent: { xs: 'center', md: 'flex-end' } }}>
         <CustomPagination
-          page={paginationModel.page + 1}
+          page={paginationModel.page + 1} // Adjusting for 1-based index used by Pagination component
           pageCount={Math.ceil(items.length / paginationModel.pageSize)}
-          onPageChange={(event, value) =>
-            setPaginationModel((prev) => ({ ...prev, page: value - 1 }))
+          onPageChange={(event, page) =>
+            handlePaginationModelChange({ page: page - 1, pageSize: paginationModel.pageSize })
           }
         />
-      </Box>
+      </Card>
     </Stack>
   );
 };

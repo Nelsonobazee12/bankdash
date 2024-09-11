@@ -1,52 +1,78 @@
+import React, { useState, useEffect } from 'react';
 import { Card, List, ListItem, Stack, Typography } from '@mui/material';
 import CardContainer from 'components/common/CardContainter';
 import CoinIcon from 'components/icons/card-icons/CoinIcon';
 import CreditCardIcon from 'components/icons/card-icons/CreditCardIcon';
 import PaypalIcon from 'components/icons/card-icons/PaypalIcon';
 import { currencyFormat } from 'helpers/utils';
+import Cookies from 'js-cookie';
 
-/* ---------------------------- Transaction Data ---------------------------- */
-const transactions = [
-  {
-    id: 1,
-    icon: CreditCardIcon,
-    bgcolor: 'warning.light',
-    title: 'Deposit from my Card',
-    type: 'debit',
-    date: '25 January 2021',
-    amount: 500,
-    amountColor: 'error.main',
-  },
-  {
-    id: 2,
-    icon: PaypalIcon,
-    bgcolor: 'neutral.light',
-    title: 'Deposit Paypal',
-    type: 'credit',
-    date: '25 January 2021',
-    amount: 500,
-    amountColor: 'success.main',
-  },
-  {
-    id: 3,
-    icon: CoinIcon,
-    bgcolor: 'success.lighter',
-    title: 'Jemi Wilson',
-    type: 'credit',
-    date: '25 January 2021',
-    amount: 500,
-    amountColor: 'success.main',
-  },
-];
-/* -------------------------------------------------------------------------- */
+const backendUrl: string = import.meta.env.VITE_BACKEND_URL || 'default_url';
 
-const RecentTransactions = () => {
+interface Transaction {
+  id: number;
+  icon: string;
+  title: string;
+  bgcolor: string;
+  type: 'debit' | 'credit';
+  date: string;
+  amount: number;
+  amountColor: string;
+}
+
+const iconMap: Record<string, React.ElementType> = {
+  CreditCardIcon: CreditCardIcon,
+  PaypalIcon: PaypalIcon,
+  CoinIcon: CoinIcon,
+};
+
+export const RecentTransactions: React.FC = () => {
+  const accessToken = Cookies.get('accessToken');
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const response = await fetch(`${backendUrl}/api/v1/cards/bank-card/transactions`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data: Transaction[] = await response.json();
+        // Sort transactions by date in descending order
+        const sortedTransactions = data.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        );
+        setTransactions(sortedTransactions);
+      } catch (error) {
+        setError('Failed to fetch transaction data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, [accessToken]);
+
+  if (loading) return <Typography>Loading...</Typography>;
+  if (error) return <Typography color="error">{error}</Typography>;
+
   return (
     <CardContainer title="Recent Transactions">
       <Card sx={{ p: { xs: 0.5, xl: 1 } }}>
         <List disablePadding sx={{ color: 'primary.main', '& > *:not(:last-child)': { mb: 2.5 } }}>
-          {transactions.map(
-            ({ id, icon: IconComponent, bgcolor, title, date, amount, type, amountColor }) => (
+          {transactions.map(({ id, icon, bgcolor, title, date, amount, type, amountColor }) => {
+            const IconComponent = iconMap[icon];
+            return (
               <ListItem
                 key={id}
                 sx={{
@@ -124,12 +150,10 @@ const RecentTransactions = () => {
                   </Typography>
                 </Stack>
               </ListItem>
-            ),
-          )}
+            );
+          })}
         </List>
       </Card>
     </CardContainer>
   );
 };
-
-export default RecentTransactions;

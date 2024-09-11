@@ -24,3 +24,9 @@ export const numberFormat = (number: number, notation: 'standard' | 'compact' = 
   new Intl.NumberFormat('en-US', {
     notation,
   }).format(number);
+
+// utils.ts
+export const shortenString = (value: string, startLength: number = 4, endLength: number = 4) => {
+  if (value.length <= startLength + endLength) return value;
+  return `${value.slice(0, startLength)}...${value.slice(-endLength)}`;
+};
