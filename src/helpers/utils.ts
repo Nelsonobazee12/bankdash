@@ -6,8 +6,8 @@ import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 dayjs.extend(localizedFormat);
 
-export const dateFormatFromUTC = (dateString: Date) => {
-  return dayjs.utc(dateString).local().format('D MMM, h.mm A');
+export const dateFormatFromUTC = (dateString: string) => {
+  return dayjs.utc(dateString).local().subtract(1, 'hour').format('D MMM, h.mm A');
 };
 
 export const currencyFormat = (amount: number, options: Intl.NumberFormatOptions = {}) => {

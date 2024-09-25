@@ -66,7 +66,7 @@ const NotificationDropdown = ({ open, onClose }: NotificationDropdownProps) => {
         const sortedNotifications = data.sort(
           (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
         );
-        setNotifications(sortedNotifications);
+        setNotifications(sortedNotifications.slice(0, 20));
       } catch (error) {
         setError('Error fetching data:');
       } finally {
@@ -119,7 +119,7 @@ const NotificationDropdown = ({ open, onClose }: NotificationDropdownProps) => {
                 <ListItemAvatar>
                   <Avatar
                     sx={{ bgcolor: 'action.disabledBackground', width: 35, height: 35 }}
-                    src={notification.appUser.profileImage || defaultAvatar}
+                    src={notification.appUser?.profileImage || defaultAvatar}
                   />
                 </ListItemAvatar>
                 <ListItemText

@@ -10,7 +10,7 @@ const AuthLayout = lazy(() => import('layouts/auth-layout'));
 const Dashboard = lazy(() => import('pages/dashboard'));
 const Spinner = lazy(() => import('components/loading/Splash'));
 const LoadingProgress = lazy(() => import('components/loading/LoadingProgress'));
-
+const TransactionActions = lazy(() => import('pages/TransactionAction'));
 const LoginPage = lazy(() => import('pages/authentication/login'));
 const SignUpPage = lazy(() => import('pages/authentication/signup'));
 const ForgetPasswordPage = lazy(() => import('pages/authentication/forget-password'));
@@ -46,10 +46,15 @@ export const routes = [
             // Protect this route
             element: <PrivateRoute element={<Dashboard />} />,
           },
+          // {
+          //   path: paths.transactions,
+          //   // Protect this route
+          //   element: <PrivateRoute element={<Dashboard />} />,
+          // },
+
           {
             path: paths.transactions,
-            // Protect this route
-            element: <PrivateRoute element={<Dashboard />} />,
+            element: <PrivateRoute element={<TransactionActions />} />,
           },
         ],
       },

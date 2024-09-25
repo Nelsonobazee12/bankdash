@@ -37,15 +37,16 @@ const MyCards: React.FC = () => {
         const data = await response.json();
         console.log('Fetched card data:', data);
 
-        if (!data || !Array.isArray(data) || data.length === 0) {
+        // Handle the case where data might be an object or an array
+        const cardDetails = Array.isArray(data) ? data[0] : data;
+
+        if (!cardDetails || !cardDetails.id) {
           throw new Error('No card data found');
         }
 
-        const cardDetails = data[0]; // Assuming we're using the first card in the array
-
         const formattedCardData: CardData = {
           id: cardDetails.id,
-          theme: 'blue', // You can adjust this based on your criteria
+          theme: 'blue', // Adjust this based on your criteria
           data: {
             balance: cardDetails.balance.toString(),
             cardHolderName: cardDetails.cardHolderName,
@@ -71,7 +72,18 @@ const MyCards: React.FC = () => {
   }
 
   if (error) {
-    return <Typography>Error: {error}</Typography>;
+    return (
+      <Typography
+        sx={{
+          color: 'error.main', // Red color to indicate an error
+          textAlign: 'center',
+          fontWeight: 'bold',
+          mt: 2,
+        }}
+      >
+        We're having trouble fetching your card details. Please try again later.
+      </Typography>
+    );
   }
 
   if (!cardData) {
