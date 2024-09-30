@@ -42,6 +42,12 @@ const RecentTransactions: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchTransactions = async () => {
+    if (!accessToken) {
+      setError('Access token is missing.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(`${backendUrl}/api/v1/cards/bank-card/transactions`, {
         method: 'GET',
@@ -53,10 +59,16 @@ const RecentTransactions: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        const errorMessage = await response.text(); // Capture error message
+        throw new Error(`Fetch error: ${errorMessage}`);
       }
 
       const data: Transaction[] = await response.json();
+
+      if (!data || data.length === 0) {
+        setError('No transactions available.');
+        return; // Early exit if no data
+      }
 
       const transformedData: ExtendedTransaction[] = data
         .map((transaction) => {
@@ -67,8 +79,6 @@ const RecentTransactions: React.FC = () => {
               amountColor = 'success.main';
               break;
             case 'WITHDRAWAL':
-              amountColor = 'error.main';
-              break;
             case 'TRANSFER':
               amountColor = 'error.main';
               break;
@@ -83,7 +93,6 @@ const RecentTransactions: React.FC = () => {
             bgcolor: 'primary.main',
             title: transaction.type, // Display the transaction type
             amountColor: amountColor,
-            date: transaction.timestamp,
           };
         })
         .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
