@@ -15,7 +15,7 @@ interface CardData {
 const MyCards: React.FC = () => {
   const [cardData, setCardData] = useState<CardData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const accessToken = Cookies.get('accessToken');
@@ -58,7 +58,6 @@ const MyCards: React.FC = () => {
         setCardData(formattedCardData);
       } catch (error) {
         console.error('Error fetching card details:', error);
-        setError((error as Error).message);
       } finally {
         setLoading(false);
       }
@@ -71,20 +70,20 @@ const MyCards: React.FC = () => {
     return <Typography>Loading...</Typography>;
   }
 
-  if (error) {
-    return (
-      <Typography
-        sx={{
-          color: 'error.main', // Red color to indicate an error
-          textAlign: 'center',
-          fontWeight: 'bold',
-          mt: 2,
-        }}
-      >
-        We're having trouble fetching your card details. Please try again later.
-      </Typography>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <Typography
+  //       sx={{
+  //         color: 'error.main', // Red color to indicate an error
+  //         textAlign: 'center',
+  //         fontWeight: 'bold',
+  //         mt: 2,
+  //       }}
+  //     >
+  //       We're having trouble fetching your card details. Please try again later.
+  //     </Typography>
+  //   );
+  // }
 
   if (!cardData) {
     return <Typography>No card data available.</Typography>;

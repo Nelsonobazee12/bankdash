@@ -10,7 +10,8 @@ const TransactionActions: React.FC = () => {
   const [amount, setAmount] = useState('');
   const [destinationCardNumber, setDestinationCardNumber] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -20,14 +21,16 @@ const TransactionActions: React.FC = () => {
   const resetForm = () => {
     setAmount('');
     setDestinationCardNumber('');
-    setMessage(null);
+    setSuccess(null);
+    setError(null);
   };
 
   const accessToken = Cookies.get('accessToken');
 
   const handleDeposit = async () => {
     setLoading(true);
-    setMessage(null);
+    setSuccess(null);
+    setError(null);
     try {
       const response = await fetch(`${backendUrl}/api/v1/cards/add-funds`, {
         method: 'POST',
@@ -39,9 +42,9 @@ const TransactionActions: React.FC = () => {
         body: JSON.stringify({ amount }),
       });
       if (!response.ok) throw new Error('Deposit failed');
-      setMessage(`Successfully deposited`);
+      setSuccess(`Successfully deposited`);
     } catch (error) {
-      setMessage('Deposit failed');
+      setError('Deposit failed');
     } finally {
       setLoading(false);
     }
@@ -49,7 +52,8 @@ const TransactionActions: React.FC = () => {
 
   const handleTransfer = async () => {
     setLoading(true);
-    setMessage(null);
+    setSuccess(null);
+    setError(null);
     try {
       const response = await fetch(`${backendUrl}/api/v1/cards/transfer`, {
         method: 'POST',
@@ -61,9 +65,9 @@ const TransactionActions: React.FC = () => {
         body: JSON.stringify({ amount, destinationCardNumber }), // Include recipient in the request
       });
       if (!response.ok) throw new Error('Transfer failed');
-      setMessage('Successfully transferred');
+      setSuccess('Successfully transferred');
     } catch (error) {
-      setMessage('Transfer failed');
+      setError('Transfer failed');
     } finally {
       setLoading(false);
     }
@@ -71,7 +75,8 @@ const TransactionActions: React.FC = () => {
 
   const handleWithdraw = async () => {
     setLoading(true);
-    setMessage(null);
+    setSuccess(null);
+    setError(null);
     try {
       const response = await fetch(`${backendUrl}/api/v1/cards/deduct-funds`, {
         method: 'POST',
@@ -83,9 +88,9 @@ const TransactionActions: React.FC = () => {
         body: JSON.stringify({ amount }),
       });
       if (!response.ok) throw new Error('Withdrawal failed');
-      setMessage(`Successfully withdrew`);
+      setSuccess(`Successfully withdrew`);
     } catch (error) {
-      setMessage('Withdrawal failed');
+      setError('Withdrawal failed');
     } finally {
       setLoading(false);
     }
@@ -154,9 +159,14 @@ const TransactionActions: React.FC = () => {
         </Button>
       </Box>
 
-      {message && (
+      {success && (
+        <Typography color="Green" marginTop={2}>
+          {success}
+        </Typography>
+      )}
+      {error && (
         <Typography color="error" marginTop={2}>
-          {message}
+          {error}
         </Typography>
       )}
 

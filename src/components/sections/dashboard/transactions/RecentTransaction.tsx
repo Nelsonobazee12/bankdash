@@ -100,7 +100,6 @@ const RecentTransactions: React.FC = () => {
       setTransactions(transformedData.slice(0, 3));
     } catch (error) {
       console.error('Error fetching transactions:', error);
-      setError('We are unable to fetch your recent transactions. Please try again later.');
     } finally {
       setLoading(false);
     }

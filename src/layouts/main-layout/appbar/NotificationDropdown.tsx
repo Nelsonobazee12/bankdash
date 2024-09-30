@@ -43,7 +43,6 @@ interface NotificationDropdownProps {
 const NotificationDropdown = ({ open, onClose }: NotificationDropdownProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const accessToken = Cookies.get('accessToken');
@@ -68,7 +67,7 @@ const NotificationDropdown = ({ open, onClose }: NotificationDropdownProps) => {
         );
         setNotifications(sortedNotifications.slice(0, 20));
       } catch (error) {
-        setError('Error fetching data:');
+        console.log('Error fetching data:');
       } finally {
         setLoading(false);
       }
@@ -80,7 +79,6 @@ const NotificationDropdown = ({ open, onClose }: NotificationDropdownProps) => {
   const totalUnreadMsg = notifications.length; // Adjusted to count all notifications
 
   if (loading) return <Typography>Loading...</Typography>;
-  if (error) return <Typography color="error">{error}</Typography>;
 
   return (
     <Fragment>
